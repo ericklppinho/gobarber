@@ -1,11 +1,12 @@
 {
-  "name": "primeiro-projeto-com-nodejs",
+  "name": "backend",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "dev:server": "ts-node-dev --inspect --transpile-only --ignore-watch node_modules src/server.ts"
+    "dev:server": "ts-node-dev --inspect --transpile-only --ignore-watch node_modules src/server.ts",
+    "start": "node dist/server.js"
   },
   "dependencies": {
     "express": "^4.17.1"
