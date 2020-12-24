@@ -2,11 +2,13 @@ import React, { useCallback, useRef } from 'react';
 import { FiLogIn, FiLock, FiMail } from 'react-icons/fi';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
+import { AxiosError } from 'axios';
 import * as Yup from 'yup';
 
 import logoImg from '../../assets/logo.svg';
 
-import { useAuth } from '../../hooks/AuthContext';
+import { useAuth } from '../../hooks/auth';
+import { useToast } from '../../hooks/toast';
 
 import Input from '../../components/Input';
 import Button from '../../components/Button';
@@ -24,6 +26,7 @@ const SignIn: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
   const { signIn } = useAuth();
+  const { addToast } = useToast();
 
   const handleSubmit = useCallback(
     async (data: SignInFormData) => {
@@ -41,7 +44,7 @@ const SignIn: React.FC = () => {
           abortEarly: false,
         });
 
-        signIn({
+        await signIn({
           email: data.email,
           password: data.password,
         });
@@ -50,12 +53,22 @@ const SignIn: React.FC = () => {
           const errors = getValidationErrors(err);
 
           formRef.current?.setErrors(errors);
+        } else if (err.request) {
+          addToast({
+            type: 'error',
+            title: 'Erro de Conexão',
+            description: 'Acesso ao sevidor indisponível.',
+          });
+        } else {
+          addToast({
+            type: 'error',
+            title: 'Erro de Autenticação',
+            description: 'E-mail ou senha inválido.',
+          });
         }
-
-        // Dispara um toast
       }
     },
-    [signIn],
+    [signIn, addToast],
   );
 
   return (
