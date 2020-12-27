@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { shade } from 'polished';
 
 import signUpBackground from '../../assets/sign-up-background.png';
@@ -11,15 +11,37 @@ export const Container = styled.div`
 `;
 
 export const Content = styled.div`
+  padding: 16px 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  max-width: 700px;
+`;
+
+const appearFromRight = keyframes`
+from {
+  opacity: 0;
+  transform: translateX(50px);
+}
+to {
+  opacity: 1;
+  transform: translateX(0);
+}
+`;
+
+export const AnimatedContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  max-width: 700px;
+
+  animation: ${appearFromRight} 1s;
 
   form {
-    margin: 80px 0;
+    margin: 65px 0;
     width: 340px;
     text-align: center;
 
@@ -28,7 +50,7 @@ export const Content = styled.div`
     }
   }
 
-  a {
+  > a {
     // ">" é usado para a estilização do "a" não descer níveis.
     // Estilizar somente o nível atual.
     color: #f4ede8;

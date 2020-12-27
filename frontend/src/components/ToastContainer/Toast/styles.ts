@@ -34,14 +34,15 @@ export const Container = styled(animated.div)<ContainerProps>`
     margin-top: 8px;
   }
 
-  ${props => toastTypeVariations[props.type || 'info']}
-
   > svg {
-    margin: 4px 12px 0 0;
+    position: absolute;
+    left: 16px;
+    top: 16px;
   }
 
   div {
     flex: 1;
+    margin: 0px 30px;
     p {
       margin-top: 4px;
       font-size: 14px;
@@ -53,7 +54,7 @@ export const Container = styled(animated.div)<ContainerProps>`
   button {
     position: absolute;
     right: 16px;
-    top: 19px;
+    top: 16px;
     opacity: 0.6;
     // Redefinir o padrão das propriedades.
     border: 0;
@@ -61,6 +62,8 @@ export const Container = styled(animated.div)<ContainerProps>`
     // Pega a cor definida em algum container superior.
     color: inherit;
   }
+
+  ${props => toastTypeVariations[props.type || 'info']}
 
   ${props =>
     !props.hasDescription &&

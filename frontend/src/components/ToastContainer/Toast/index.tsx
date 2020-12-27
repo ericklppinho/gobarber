@@ -27,7 +27,7 @@ const Toast: React.FC<ToastProps> = ({ message, style }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       removeToast(message.id);
-    }, 4000);
+    }, 5000);
 
     // Esta função do "return" do "useEffect" é chamada somente quando o component é removido.
     return () => {
