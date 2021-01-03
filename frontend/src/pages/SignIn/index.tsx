@@ -67,7 +67,7 @@ const SignIn: React.FC = () => {
             addToast({
               type: 'error',
               title: 'Erro de Autenticação',
-              description: 'E-mail ou senha inválido.',
+              description: 'Cheque as credenciais.',
             });
           } else if (err.request.status === 500) {
             addToast({
