@@ -27,6 +27,7 @@ import {
 } from './styles';
 
 import logoImg from '../../assets/logo.png';
+import { useAuth } from '../../hooks/auth';
 import getValidationErrors from '../../utils/getValidationErrors';
 
 interface SignInFormData {
@@ -37,63 +38,52 @@ interface SignInFormData {
 const SignIn: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
   const passwordInputRef = useRef<TextInput>(null);
+
   const navigation = useNavigation();
 
-  const handleSignIn = useCallback(async (data: SignInFormData) => {
-    try {
-      formRef.current?.setErrors({});
+  const { signIn } = useAuth();
 
-      const schema = Yup.object().shape({
-        email: Yup.string()
-          .required('E-mail obrigatório')
-          .email('Digite um e-mail válido'),
-        password: Yup.string().required('Senha obrigatória'),
-      });
+  const handleSignIn = useCallback(
+    async (data: SignInFormData) => {
+      try {
+        formRef.current?.setErrors({});
 
-      await schema.validate(data, {
-        abortEarly: false,
-      });
+        const schema = Yup.object().shape({
+          email: Yup.string()
+            .required('E-mail obrigatório')
+            .email('Digite um e-mail válido'),
+          password: Yup.string().required('Senha obrigatória'),
+        });
 
-      // await signIn({
-      //   email: data.email,
-      //   password: data.password,
-      // });
+        await schema.validate(data, {
+          abortEarly: false,
+        });
 
-      // history.push('/dashboard');
-    } catch (err) {
-      if (err instanceof Yup.ValidationError) {
-        const errors = getValidationErrors(err);
+        await signIn({
+          email: data.email,
+          password: data.password,
+        });
+      } catch (err) {
+        if (err instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(err);
 
-        formRef.current?.setErrors(errors);
-      } else if (err.request) {
-        if (err.request.status === 0) {
-          Alert.alert('Erro de Conexão', 'Acesso ao sevidor indisponível.');
-          // addToast({
-          //   type: 'error',
-          //   title: 'Erro de Conexão',
-          //   description: 'Acesso ao sevidor indisponível.',
-          // });
-        } else if (err.request.status === 401) {
-          Alert.alert('Erro de Autenticação', 'Cheque as credenciais.');
-          // addToast({
-          //   type: 'error',
-          //   title: 'Erro de Autenticação',
-          //   description: 'E-mail ou senha inválido.',
-          // });
-        } else if (err.request.status === 500) {
-          Alert.alert(
-            'Erro no Servidor',
-            'Entre em contato com o administrador.',
-          );
-          // addToast({
-          //   type: 'error',
-          //   title: 'Erro no Servidor',
-          //   description: 'Entre em contato com o administrador.',
-          // });
+          formRef.current?.setErrors(errors);
+        } else if (err.request) {
+          if (err.request.status === 0) {
+            Alert.alert('Erro de Conexão', 'Acesso ao sevidor indisponível.');
+          } else if (err.request.status === 401) {
+            Alert.alert('Erro de Autenticação', 'Cheque as credenciais.');
+          } else if (err.request.status === 500) {
+            Alert.alert(
+              'Erro no Servidor',
+              'Entre em contato com o administrador.',
+            );
+          }
         }
       }
-    }
-  }, []);
+    },
+    [signIn],
+  );
 
   return (
     <>
