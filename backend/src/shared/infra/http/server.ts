@@ -6,9 +6,11 @@ import 'express-async-errors';
 
 import uploadConfig from '@config/upload';
 
+import '@shared/container';
+import '@shared/infra/typeorm';
+
 import routes from '@shared/infra/http/routes';
 import globalErrorHandler from '@shared/infra/http/middlewares/globalErrorHandler';
-import '@shared/infra/typeorm';
 
 const app = express();
 
