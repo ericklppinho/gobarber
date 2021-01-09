@@ -5,7 +5,7 @@ import FakeUsersRepository from '@modules/users/repositories/fakes/FakeUsersRepo
 
 import UpdateUserAvatarService from './UpdateUserAvatarService';
 
-describe('UpdateUserAvatar', async () => {
+describe('UpdateUserAvatar', () => {
   it('should be able to update user avatar', async () => {
     const fakeUsersRepository = new FakeUsersRepository();
     const fakeStorageProvider = new FakeStorageProvider();
