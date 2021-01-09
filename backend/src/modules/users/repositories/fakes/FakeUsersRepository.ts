@@ -9,13 +9,21 @@ export default class FakeUsersRepository implements IUsersRepository {
   private users: User[] = [];
 
   public async findById(id: string): Promise<User | undefined> {
-    const findUser = this.users.find(user => user.id === id);
+    let findUser = this.users.find(user => user.id === id);
+
+    if (findUser) {
+      findUser = Object.create(findUser);
+    }
 
     return findUser;
   }
 
   public async findByEmail(email: string): Promise<User | undefined> {
-    const findUser = this.users.find(user => user.email === email);
+    let findUser = this.users.find(user => user.email === email);
+
+    if (findUser) {
+      findUser = Object.create(findUser);
+    }
 
     return findUser;
   }
@@ -27,7 +35,7 @@ export default class FakeUsersRepository implements IUsersRepository {
 
     this.users.push(user);
 
-    return user;
+    return Object.create(user);
   }
 
   public async save(user: User): Promise<User> {
@@ -35,6 +43,6 @@ export default class FakeUsersRepository implements IUsersRepository {
 
     this.users[findIndex] = user;
 
-    return user;
+    return Object.create(user);
   }
 }
