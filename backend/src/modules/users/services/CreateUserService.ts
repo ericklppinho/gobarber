@@ -13,6 +13,8 @@ interface IRequest {
   password: string;
 }
 
+type IResponse = Omit<User, 'password'>;
+
 @injectable()
 class CreateUserService {
   constructor(
@@ -23,7 +25,11 @@ class CreateUserService {
     private hashProvider: IHashProvider,
   ) {}
 
-  public async execute({ name, email, password }: IRequest): Promise<User> {
+  public async execute({
+    name,
+    email,
+    password,
+  }: IRequest): Promise<IResponse> {
     const checkUserExists = await this.usersRepository.findByEmail(email);
 
     if (checkUserExists) {
@@ -38,9 +44,9 @@ class CreateUserService {
       password: hashedPassword,
     });
 
-    delete user.password;
+    const { password: omited, ...userWithoutPassword } = user;
 
-    return user;
+    return userWithoutPassword;
   }
 }
 

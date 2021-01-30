@@ -1,8 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 
-import AppError from '@shared/errors/AppError';
-
 import IStorageProvider from '@shared/container/providers/StorageProvider/models/IStorageProvider';
+import AppError from '@shared/errors/AppError';
 
 import User from '@modules/users/infra/typeorm/entities/User';
 import IUsersRepository from '@modules/users/repositories/IUsersRepository';
@@ -11,6 +10,8 @@ interface IRequest {
   user_id: string;
   avatar_filename: string;
 }
+
+type IResponse = Omit<User, 'password'>;
 
 @injectable()
 class UpdateUserAvatarService {
@@ -22,7 +23,10 @@ class UpdateUserAvatarService {
     private storageProvider: IStorageProvider,
   ) {}
 
-  public async execute({ user_id, avatar_filename }: IRequest): Promise<User> {
+  public async execute({
+    user_id,
+    avatar_filename,
+  }: IRequest): Promise<IResponse> {
     const user = await this.usersRepository.findById(user_id);
 
     if (!user) {
@@ -39,9 +43,9 @@ class UpdateUserAvatarService {
 
     await this.usersRepository.save(user);
 
-    delete user.password;
+    const { password: omited, ...userWithoutPassword } = user;
 
-    return user;
+    return userWithoutPassword;
   }
 }
 

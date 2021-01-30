@@ -25,7 +25,7 @@ describe('ResetPasswordService', () => {
   });
 
   it('should be able to reset the password', async () => {
-    let user = await fakeUsersRepository.create({
+    const user = await fakeUsersRepository.create({
       name: 'John Doe',
       email: 'johndoe@example.com',
       password: '123456',
@@ -40,10 +40,10 @@ describe('ResetPasswordService', () => {
       password: '123123',
     });
 
-    user = await fakeUsersRepository.findById(user.id);
+    const findUser = await fakeUsersRepository.findById(user.id);
 
     expect(generateHash).toBeCalledWith('123123');
-    expect(user.password).toBe('123123');
+    expect(findUser?.password).toBe('123123');
   });
 
   it('should not be able to reset the password with non-existing token', async () => {

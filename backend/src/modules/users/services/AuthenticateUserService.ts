@@ -16,7 +16,7 @@ interface IRequest {
 }
 
 interface IResponse {
-  user: User;
+  user: Omit<User, 'password'>;
   token: string;
 }
 
@@ -53,10 +53,10 @@ class AuthenticateUserService {
       expiresIn,
     });
 
-    delete user.password;
+    const { password: omited, ...userWithoutPassword } = user;
 
     return {
-      user,
+      user: userWithoutPassword,
       token,
     };
   }

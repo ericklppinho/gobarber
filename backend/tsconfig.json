@@ -6,7 +6,7 @@
     "rootDir": "./src",
     "removeComments": true,
     "strict": true,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "strictPropertyInitialization": false,
     "moduleResolution": "node",
     "baseUrl": "./src",
