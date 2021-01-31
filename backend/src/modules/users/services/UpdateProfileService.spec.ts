@@ -20,7 +20,7 @@ describe('UpdateProfile', () => {
     );
   });
 
-  it('should be able to update profile', async () => {
+  it('should be able to update the profile', async () => {
     const user = await fakeUsersRepository.create({
       name: 'John Doe',
       email: 'johndoe@example.com',
@@ -30,11 +30,21 @@ describe('UpdateProfile', () => {
     const updatedUser = await updateProfileService.execute({
       user_id: user.id,
       name: 'John Trê',
-      email: 'johntre@exemple.com',
+      email: 'johntre@example.com',
     });
 
     expect(updatedUser.name).toBe('John Trê');
-    expect(updatedUser.email).toBe('johntre@exemple.com');
+    expect(updatedUser.email).toBe('johntre@example.com');
+  });
+
+  it('should not be able to update the profile from non-existing user', async () => {
+    await expect(
+      updateProfileService.execute({
+        user_id: 'non-existing-user-id',
+        name: 'John Doe',
+        email: 'johndoe@example.com',
+      }),
+    ).rejects.toBeInstanceOf(AppError);
   });
 
   it('should not be able to change the email to another user email', async () => {
@@ -69,7 +79,7 @@ describe('UpdateProfile', () => {
     await updateProfileService.execute({
       user_id: user.id,
       name: 'John Trê',
-      email: 'johntre@exemple.com',
+      email: 'johntre@example.com',
       old_password: '123456',
       password: '123123',
     });
@@ -111,8 +121,8 @@ describe('UpdateProfile', () => {
     await expect(
       updateProfileService.execute({
         user_id: user.id,
-        name: 'John Trê',
-        email: 'johntre@exemple.com',
+        name: 'John Doe',
+        email: 'johndoe@example.com',
         password: '123123',
       }),
     ).rejects.toBeInstanceOf(AppError);
@@ -128,8 +138,8 @@ describe('UpdateProfile', () => {
     await expect(
       updateProfileService.execute({
         user_id: user.id,
-        name: 'John Trê',
-        email: 'johntre@exemple.com',
+        name: 'John Doe',
+        email: 'johndoe@example.com',
         old_password: 'wrong-old-password',
         password: '123123',
       }),

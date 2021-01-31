@@ -2,7 +2,6 @@ import { v4 as uuid } from 'uuid';
 
 import UserToken from '@modules/users/infra/typeorm/entities/UserToken';
 import IUserTokensRepository from '@modules/users/repositories/IUserTokensRepository';
-import AppError from '@shared/errors/AppError';
 
 export default class FakeUserTokensRepository implements IUserTokensRepository {
   private userTokens: UserToken[] = [];
@@ -23,15 +22,15 @@ export default class FakeUserTokensRepository implements IUserTokensRepository {
     return { ...userToken };
   }
 
-  public async findByToken(token: string): Promise<UserToken> {
-    const userToken = this.userTokens.find(
+  public async findByToken(token: string): Promise<UserToken | undefined> {
+    let userToken = this.userTokens.find(
       findToken => findToken.token === token,
     );
 
-    if (!userToken) {
-      throw new AppError('User token not found');
+    if (userToken) {
+      userToken = { ...userToken };
     }
 
-    return { ...userToken };
+    return userToken;
   }
 }
