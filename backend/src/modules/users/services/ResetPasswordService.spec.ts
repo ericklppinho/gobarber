@@ -40,7 +40,7 @@ describe('ResetPasswordService', () => {
       password: '123123',
     });
 
-    const findUser = await fakeUsersRepository.findById(user.id);
+    const findUser = await fakeUsersRepository.findById({ user_id: user.id });
 
     expect(generateHash).toBeCalledWith('123123');
     expect(findUser?.password).toBe('123123');

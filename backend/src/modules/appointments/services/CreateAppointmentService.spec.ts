@@ -15,28 +15,141 @@ describe('CreateAppointment', () => {
   });
 
   it('should be able to create a new appointment', async () => {
+    jest.spyOn(Date, 'now').mockImplementationOnce(() => {
+      return new Date(2020, 4, 10, 12).getTime();
+    });
+
     const appointment = await createAppointmentsService.execute({
-      date: new Date(),
-      provider_id: '123123',
+      provider_id: 'provider-id',
+      user_id: 'user-id',
+      date: new Date(2020, 4, 10, 13),
     });
 
     expect(appointment).toHaveProperty('id');
-    expect(appointment.provider_id).toBe('123123');
+    expect(appointment.provider_id).toBe('provider-id');
   });
 
   it('should not be able to create two appointments in the same hour', async () => {
-    const appointmentDate = new Date(2020, 4, 10, 11);
+    jest.spyOn(Date, 'now').mockImplementation(() => {
+      return new Date(2020, 4, 10, 12).getTime();
+    });
+
+    const appointmentDate = new Date(2020, 4, 10, 13);
 
     await createAppointmentsService.execute({
+      provider_id: 'provider-id',
+      user_id: 'user-id',
       date: appointmentDate,
-      provider_id: '123123',
     });
 
     await expect(
       createAppointmentsService.execute({
+        provider_id: 'provider-id',
+        user_id: 'user-id',
         date: appointmentDate,
-        provider_id: '123123',
       }),
     ).rejects.toBeInstanceOf(AppError);
+
+    await expect(
+      createAppointmentsService.execute({
+        provider_id: 'provider-id',
+        user_id: 'user-id',
+        date: appointmentDate,
+      }),
+    ).rejects.toHaveProperty('message', 'This appointment is already booked');
+  });
+
+  it('should not be able to create an appointment an a past date', async () => {
+    jest.spyOn(Date, 'now').mockImplementationOnce(() => {
+      return new Date(2020, 4, 10, 12).getTime();
+    });
+
+    await expect(
+      createAppointmentsService.execute({
+        provider_id: 'provider-id',
+        user_id: 'user-id',
+        date: new Date(2020, 4, 10, 11),
+      }),
+    ).rejects.toBeInstanceOf(AppError);
+
+    await expect(
+      createAppointmentsService.execute({
+        provider_id: 'provider-id',
+        user_id: 'user-id',
+        date: new Date(2020, 4, 10, 11),
+      }),
+    ).rejects.toHaveProperty(
+      'message',
+      "You can't create an appointment on a past date.",
+    );
+  });
+
+  it('should not be able to create an appointment with same user as provider', async () => {
+    jest.spyOn(Date, 'now').mockImplementation(() => {
+      return new Date(2020, 4, 10, 12).getTime();
+    });
+
+    await expect(
+      createAppointmentsService.execute({
+        provider_id: 'user-id',
+        user_id: 'user-id',
+        date: new Date(2020, 4, 10, 13),
+      }),
+    ).rejects.toBeInstanceOf(AppError);
+
+    await expect(
+      createAppointmentsService.execute({
+        provider_id: 'user-id',
+        user_id: 'user-id',
+        date: new Date(2020, 4, 10, 13),
+      }),
+    ).rejects.toHaveProperty(
+      'message',
+      "You can't create an appointment with yourself.",
+    );
+  });
+
+  it('should not be able to create an appointment before 8am and after 5pm', async () => {
+    jest.spyOn(Date, 'now').mockImplementation(() => {
+      return new Date(2020, 4, 10, 5).getTime();
+    });
+
+    await expect(
+      createAppointmentsService.execute({
+        provider_id: 'provider-id',
+        user_id: 'user-id',
+        date: new Date(2020, 4, 10, 7),
+      }),
+    ).rejects.toBeInstanceOf(AppError);
+
+    await expect(
+      createAppointmentsService.execute({
+        provider_id: 'provider-id',
+        user_id: 'user-id',
+        date: new Date(2020, 4, 10, 7),
+      }),
+    ).rejects.toHaveProperty(
+      'message',
+      'You can only create appointments between 8am and 5pm.',
+    );
+
+    await expect(
+      createAppointmentsService.execute({
+        provider_id: 'provider-id',
+        user_id: 'user-id',
+        date: new Date(2020, 4, 10, 18),
+      }),
+    ).rejects.toBeInstanceOf(AppError);
+
+    await expect(
+      createAppointmentsService.execute({
+        provider_id: 'provider-id',
+        user_id: 'user-id',
+        date: new Date(2020, 4, 10, 18),
+      }),
+    ).rejects.toHaveProperty(
+      'message',
+      'You can only create appointments between 8am and 5pm.',
+    );
   });
 });

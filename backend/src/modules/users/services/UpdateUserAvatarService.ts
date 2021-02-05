@@ -27,7 +27,7 @@ class UpdateUserAvatarService {
     user_id,
     avatar_filename,
   }: IRequest): Promise<IResponse> {
-    const user = await this.usersRepository.findById(user_id);
+    const user = await this.usersRepository.findById({ user_id });
 
     if (!user) {
       throw new AppError('Only authenticated users can change avatar.', 401);
@@ -41,9 +41,9 @@ class UpdateUserAvatarService {
 
     user.avatar = filename;
 
-    await this.usersRepository.save(user);
+    await this.usersRepository.save(user as User);
 
-    const { password: omited, ...userWithoutPassword } = user;
+    const { password: omited, ...userWithoutPassword } = user as User;
 
     return userWithoutPassword;
   }

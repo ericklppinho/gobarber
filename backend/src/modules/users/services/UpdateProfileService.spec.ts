@@ -84,7 +84,9 @@ describe('UpdateProfile', () => {
       password: '123123',
     });
 
-    const updatedUser = await fakeUsersRepository.findById(user.id);
+    const updatedUser = await fakeUsersRepository.findById({
+      user_id: user.id,
+    });
 
     expect(updatedUser?.password).toBe('123123');
   });

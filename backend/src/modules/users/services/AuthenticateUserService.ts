@@ -31,11 +31,15 @@ class AuthenticateUserService {
   ) {}
 
   public async execute({ email, password }: IRequest): Promise<IResponse> {
-    const user = await this.usersRepository.findByEmail(email);
+    const findedUser = await this.usersRepository.findByEmail({
+      user_email: email,
+    });
 
-    if (!user) {
+    if (!findedUser) {
       throw new AppError('Incorrect email/password combination.', 401);
     }
+
+    const user = findedUser as User;
 
     const passwordMatched = await this.hashProvider.conpareHash(
       password,

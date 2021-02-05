@@ -3,6 +3,7 @@ import { addHours, isAfter } from 'date-fns';
 
 import AppError from '@shared/errors/AppError';
 
+import User from '@modules/users/infra/typeorm/entities/User';
 import IHashProvider from '@modules/users/providers/HashProvider/models/IHashProvider';
 import IUsersRepository from '@modules/users/repositories/IUsersRepository';
 import IUserTokensRepository from '@modules/users/repositories/IUserTokensRepository';
@@ -38,11 +39,15 @@ class ResetPasswordService {
       throw new AppError('Token expired');
     }
 
-    const user = await this.usersRepository.findById(userToken.user_id);
+    const findedUser = await this.usersRepository.findById({
+      user_id: userToken.user_id,
+    });
 
-    if (!user) {
+    if (!findedUser) {
       throw new AppError('User does not exixts');
     }
+
+    const user = findedUser as User;
 
     user.password = await this.hashProvider.generateHash(password);
 

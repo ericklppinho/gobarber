@@ -30,7 +30,9 @@ class CreateUserService {
     email,
     password,
   }: IRequest): Promise<IResponse> {
-    const checkUserExists = await this.usersRepository.findByEmail(email);
+    const checkUserExists = await this.usersRepository.findByEmail({
+      user_email: email,
+    });
 
     if (checkUserExists) {
       throw new AppError('Email address already used.');
