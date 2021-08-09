@@ -1,4 +1,7 @@
+import { classToClass } from 'class-transformer';
 import { inject, injectable } from 'tsyringe';
+
+import ICacheProvider from '@shared/container/providers/CacheProvider/models/ICacheProvider';
 
 import User from '@modules/users/infra/typeorm/entities/User';
 import IUsersRepository from '@modules/users/repositories/IUsersRepository';
@@ -7,20 +10,30 @@ interface IRequest {
   user_id: string;
 }
 
-type IResponse = Omit<User, 'password'>[];
-
 @injectable()
 class ListProvidersService {
   constructor(
     @inject('UsersRepository')
     private usersRepository: IUsersRepository,
+
+    @inject('CacheProvider')
+    private cacheProvider: ICacheProvider,
   ) {}
 
-  public async execute({ user_id }: IRequest): Promise<IResponse> {
-    const users = await this.usersRepository.findAll({
-      except_user_id: user_id,
-      without_password: true,
-    });
+  public async execute({ user_id }: IRequest): Promise<User[]> {
+    let users = await this.cacheProvider.recover<User[]>(
+      `providers-list:${user_id}`,
+    );
+
+    if (!users) {
+      users = await this.usersRepository.findAll({
+        except_user_id: user_id,
+      });
+
+      users = classToClass(users);
+
+      await this.cacheProvider.save(`providers-list:${user_id}`, users);
+    }
 
     return users;
   }

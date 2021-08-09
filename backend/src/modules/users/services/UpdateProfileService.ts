@@ -14,8 +14,6 @@ interface IRequest {
   password?: string;
 }
 
-type IResponse = Omit<User, 'password'>;
-
 @injectable()
 class UpdateProfileService {
   constructor(
@@ -32,22 +30,18 @@ class UpdateProfileService {
     email,
     old_password,
     password,
-  }: IRequest): Promise<IResponse> {
-    const findedUser = await this.usersRepository.findById({ user_id });
+  }: IRequest): Promise<User> {
+    const user = await this.usersRepository.findById(user_id);
 
-    if (!findedUser) {
+    if (!user) {
       throw new AppError('User not found.');
     }
 
-    const userWhithUpdatedEmail = await this.usersRepository.findByEmail({
-      user_email: email,
-    });
+    const userWhithUpdatedEmail = await this.usersRepository.findByEmail(email);
 
     if (userWhithUpdatedEmail && userWhithUpdatedEmail.id !== user_id) {
       throw new AppError('E-mail already in use.');
     }
-
-    const user = findedUser as User;
 
     user.name = name;
     user.email = email;
@@ -71,12 +65,9 @@ class UpdateProfileService {
       user.password = await this.hashProvider.generateHash(password);
     }
 
-    const {
-      password: omited,
-      ...userWithoutPassword
-    } = await this.usersRepository.save(user);
+    await this.usersRepository.save(user);
 
-    return userWithoutPassword;
+    return user;
   }
 }
 

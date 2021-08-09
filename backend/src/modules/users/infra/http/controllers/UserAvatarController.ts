@@ -1,3 +1,4 @@
+import { classToClass } from 'class-transformer';
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
 
@@ -13,6 +14,6 @@ export default class UserAvatarController {
       avatar_filename: request.file.filename,
     });
 
-    return response.json(user);
+    return response.json(classToClass(user));
   }
 }

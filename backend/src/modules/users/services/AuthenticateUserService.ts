@@ -16,7 +16,7 @@ interface IRequest {
 }
 
 interface IResponse {
-  user: Omit<User, 'password'>;
+  user: User;
   token: string;
 }
 
@@ -31,9 +31,7 @@ class AuthenticateUserService {
   ) {}
 
   public async execute({ email, password }: IRequest): Promise<IResponse> {
-    const findedUser = await this.usersRepository.findByEmail({
-      user_email: email,
-    });
+    const findedUser = await this.usersRepository.findByEmail(email);
 
     if (!findedUser) {
       throw new AppError('Incorrect email/password combination.', 401);
@@ -57,10 +55,8 @@ class AuthenticateUserService {
       expiresIn,
     });
 
-    const { password: omited, ...userWithoutPassword } = user;
-
     return {
-      user: userWithoutPassword,
+      user,
       token,
     };
   }

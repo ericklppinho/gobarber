@@ -11,8 +11,6 @@ interface IRequest {
   avatar_filename: string;
 }
 
-type IResponse = Omit<User, 'password'>;
-
 @injectable()
 class UpdateUserAvatarService {
   constructor(
@@ -23,11 +21,8 @@ class UpdateUserAvatarService {
     private storageProvider: IStorageProvider,
   ) {}
 
-  public async execute({
-    user_id,
-    avatar_filename,
-  }: IRequest): Promise<IResponse> {
-    const user = await this.usersRepository.findById({ user_id });
+  public async execute({ user_id, avatar_filename }: IRequest): Promise<User> {
+    const user = await this.usersRepository.findById(user_id);
 
     if (!user) {
       throw new AppError('Only authenticated users can change avatar.', 401);
@@ -43,9 +38,7 @@ class UpdateUserAvatarService {
 
     await this.usersRepository.save(user as User);
 
-    const { password: omited, ...userWithoutPassword } = user as User;
-
-    return userWithoutPassword;
+    return user;
   }
 }
 

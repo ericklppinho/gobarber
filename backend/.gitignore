@@ -1,7 +1,12 @@
 .vscode/
 coverage/
-node_modules/
 dist/
+node_modules/
 tmp/*
 !tmp/.gitkeep
+!tmp/uploads/
+tmp/uploads/*
+
+.env
 yarn-error.log
+ormconfig.json

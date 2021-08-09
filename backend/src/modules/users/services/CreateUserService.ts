@@ -1,5 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 
+import ICacheProvider from '@shared/container/providers/CacheProvider/models/ICacheProvider';
 import AppError from '@shared/errors/AppError';
 
 import User from '@modules/users/infra/typeorm/entities/User';
@@ -13,8 +14,6 @@ interface IRequest {
   password: string;
 }
 
-type IResponse = Omit<User, 'password'>;
-
 @injectable()
 class CreateUserService {
   constructor(
@@ -23,16 +22,13 @@ class CreateUserService {
 
     @inject('HashProvider')
     private hashProvider: IHashProvider,
+
+    @inject('CacheProvider')
+    private cacheProvider: ICacheProvider,
   ) {}
 
-  public async execute({
-    name,
-    email,
-    password,
-  }: IRequest): Promise<IResponse> {
-    const checkUserExists = await this.usersRepository.findByEmail({
-      user_email: email,
-    });
+  public async execute({ name, email, password }: IRequest): Promise<User> {
+    const checkUserExists = await this.usersRepository.findByEmail(email);
 
     if (checkUserExists) {
       throw new AppError('Email address already used.');
@@ -46,9 +42,9 @@ class CreateUserService {
       password: hashedPassword,
     });
 
-    const { password: omited, ...userWithoutPassword } = user;
+    await this.cacheProvider.invalidatePrefix('providers-list');
 
-    return userWithoutPassword;
+    return user;
   }
 }
 

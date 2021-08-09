@@ -1,6 +1,8 @@
 import nodemailer, { Transporter } from 'nodemailer';
 import { inject, injectable } from 'tsyringe';
 
+import mailConfig from '@config/mail';
+
 import ISendMailDTO from '@shared/container/providers/MailProvider/dtos/ISendMailDTO';
 import IMailProvider from '@shared/container/providers/MailProvider/models/IMailProvider';
 import IMailTemplateProvider from '@shared/container/providers/MailTemplateProvider/models/IMailTemplateProvider';
@@ -14,7 +16,7 @@ export default class EtherealMailProvider implements IMailProvider {
     private mailTemplateProvider: IMailTemplateProvider,
   ) {
     nodemailer.createTestAccount().then(account => {
-      this.client = nodemailer.createTransport({
+      const transporter = nodemailer.createTransport({
         host: account.smtp.host,
         port: account.smtp.port,
         secure: account.smtp.secure,
@@ -26,6 +28,8 @@ export default class EtherealMailProvider implements IMailProvider {
           rejectUnauthorized: false,
         },
       });
+
+      this.client = transporter;
     });
   }
 
@@ -35,10 +39,12 @@ export default class EtherealMailProvider implements IMailProvider {
     subject,
     templateData,
   }: ISendMailDTO): Promise<void> {
+    const { name, email } = mailConfig.from;
+
     const message = await this.client.sendMail({
       from: {
-        name: from?.name || 'Equipe GoBarber',
-        address: from?.email || 'equipe@gobarber.com.br',
+        name: from?.name || name,
+        address: from?.email || email,
       },
       to: {
         name: to.name,

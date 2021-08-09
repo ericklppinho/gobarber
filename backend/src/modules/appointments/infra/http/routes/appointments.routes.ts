@@ -1,10 +1,13 @@
+import { celebrate, Segments, Joi } from 'celebrate';
 import { Router } from 'express';
 
-import ensureAuthenticated from '@modules/users/infra/http/middlewares/ensureAuthenticated';
-import AppointmentsController from '@modules/appointments/infra/http/controller/AppointmentsController';
+import ensureAuthenticated from '@modules/users/infra/http/middlewares/ensureAuthenticatedMiddleware';
+import UsersAppointmentsController from '@modules/appointments/infra/http/controllers/UsersAppointmentsController';
+import ProviderAppointmentsController from '@modules/appointments/infra/http/controllers/ProviderAppointmentsController';
 
 const appointmentsRouter = Router();
-const appointmentsController = new AppointmentsController();
+const usersAppointmentsController = new UsersAppointmentsController();
+const providerAppointmentsController = new ProviderAppointmentsController();
 
 appointmentsRouter.use(ensureAuthenticated);
 
@@ -14,6 +17,27 @@ appointmentsRouter.use(ensureAuthenticated);
 //   return response.json(appointments);
 // });
 
-appointmentsRouter.post('/', appointmentsController.create);
+appointmentsRouter.post(
+  '/',
+  celebrate({
+    [Segments.BODY]: {
+      provider_id: Joi.string().uuid().required(),
+      date: Joi.date().required(),
+    },
+  }),
+  usersAppointmentsController.create,
+);
+
+appointmentsRouter.get(
+  '/me',
+  celebrate({
+    [Segments.BODY]: {
+      day: Joi.number().integer().min(1).max(31).required(),
+      month: Joi.number().integer().min(1).max(12).required(),
+      year: Joi.number().integer().required(),
+    },
+  }),
+  providerAppointmentsController.index,
+);
 
 export default appointmentsRouter;

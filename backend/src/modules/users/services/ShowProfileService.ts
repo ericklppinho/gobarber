@@ -9,8 +9,6 @@ interface IRequest {
   user_id: string;
 }
 
-type IResponse = Omit<User, 'password'>;
-
 @injectable()
 class ShowProfileService {
   constructor(
@@ -18,11 +16,8 @@ class ShowProfileService {
     private usersRepository: IUsersRepository,
   ) {}
 
-  public async execute({ user_id }: IRequest): Promise<IResponse> {
-    const user = await this.usersRepository.findById({
-      user_id,
-      without_password: true,
-    });
+  public async execute({ user_id }: IRequest): Promise<User> {
+    const user = await this.usersRepository.findById(user_id);
 
     if (!user) {
       throw new AppError('User not found.');

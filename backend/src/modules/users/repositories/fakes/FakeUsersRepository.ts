@@ -4,17 +4,12 @@ import User from '@modules/users/infra/typeorm/entities/User';
 
 import ICreateUserDTO from '@modules/users/dtos/ICreateUserDTO';
 import IFindAllUsersDTO from '@modules/users/dtos/IFindAllUsersDTO';
-import IFindUserByEmailDTO from '@modules/users/dtos/IFindUserByEmailDTO';
-import IFindUserByIdDTO from '@modules/users/dtos/IFindUserByIdDTO';
 import IUsersRepository from '@modules/users/repositories/IUsersRepository';
 
 export default class FakeUsersRepository implements IUsersRepository {
   private users: User[] = [];
 
-  public async findAll({
-    except_user_id,
-    without_password,
-  }: IFindAllUsersDTO): Promise<User[]> {
+  public async findAll({ except_user_id }: IFindAllUsersDTO): Promise<User[]> {
     let users: User[];
 
     if (except_user_id) {
@@ -23,50 +18,24 @@ export default class FakeUsersRepository implements IUsersRepository {
       users = [...this.users];
     }
 
-    if (without_password) {
-      return users.map(user => {
-        const { password: omited, ...userWithoutPassword } = user;
-
-        return userWithoutPassword as User;
-      });
-    }
-
     return users;
   }
 
-  public async findById({
-    user_id,
-    without_password,
-  }: IFindUserByIdDTO): Promise<User | undefined> {
+  public async findById(user_id: string): Promise<User | undefined> {
     let findUser = this.users.find(user => user.id === user_id);
 
     if (findUser) {
-      if (without_password) {
-        const { password: omited, ...userWithoutPassword } = findUser;
-
-        return userWithoutPassword as User;
-      }
-
-      findUser = { ...findUser };
+      findUser = { ...findUser } as User;
     }
 
     return findUser;
   }
 
-  public async findByEmail({
-    user_email,
-    without_password,
-  }: IFindUserByEmailDTO): Promise<User | undefined> {
-    let findUser = this.users.find(user => user.email === user_email);
+  public async findByEmail(email: string): Promise<User | undefined> {
+    let findUser = this.users.find(user => user.email === email);
 
     if (findUser) {
-      if (without_password) {
-        const { password: omited, ...userWithoutPassword } = findUser;
-
-        return userWithoutPassword as User;
-      }
-
-      findUser = { ...findUser };
+      findUser = { ...findUser } as User;
     }
 
     return findUser;
@@ -79,7 +48,7 @@ export default class FakeUsersRepository implements IUsersRepository {
 
     this.users.push(user);
 
-    return { ...user };
+    return { ...user } as User;
   }
 
   public async save(user: User): Promise<User> {
@@ -87,6 +56,6 @@ export default class FakeUsersRepository implements IUsersRepository {
 
     this.users[findIndex] = user;
 
-    return { ...user };
+    return { ...user } as User;
   }
 }

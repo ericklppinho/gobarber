@@ -4,6 +4,7 @@
     "module": "commonjs",
     "outDir": "./dist",
     "rootDir": "./src",
+    "allowJs": true,
     "removeComments": true,
     "strict": true,
     "strictNullChecks": true,
