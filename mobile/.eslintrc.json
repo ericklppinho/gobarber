@@ -1,6 +1,8 @@
 {
   "env": {
-    "es6": true
+    "es6": true,
+    "browser": true,
+    "jest": true
   },
   "extends": [
     "plugin:react/recommended",
@@ -35,6 +37,8 @@
     "react/jsx-filename-extension": [ 1, { "extensions": [ ".tsx" ] } ],
     "react/jsx-props-no-spreading": "off",
     "import/prefer-default-export": "off",
+    "import/no-duplicates": "off",
+    "camelcase": "off",
     "no-unused-vars": "off",
     "no-unused-expressions": "off",
     "no-use-before-define": "off",

@@ -41,7 +41,7 @@ const SignUp: React.FC = () => {
   const emailInputRef = useRef<TextInput>(null);
   const passwordInputRef = useRef<TextInput>(null);
 
-  const navigation = useNavigation();
+  const { goBack } = useNavigation();
 
   const handleSignUp = useCallback(
     async (data: SignUpFormData) => {
@@ -55,6 +55,7 @@ const SignUp: React.FC = () => {
             .email('Digite um e-mail válido'),
           password: Yup.string().min(6, 'No mínimo 6 dígitos'),
         });
+
         await schema.validate(data, {
           abortEarly: false,
         });
@@ -66,7 +67,7 @@ const SignUp: React.FC = () => {
           'Você já pode fazer o logon no GoBarber.',
         );
 
-        navigation.goBack();
+        goBack();
       } catch (err) {
         if (err instanceof Yup.ValidationError) {
           const errors = getValidationErrors(err);
@@ -89,7 +90,7 @@ const SignUp: React.FC = () => {
         }
       }
     },
-    [navigation],
+    [goBack],
   );
 
   return (
@@ -109,6 +110,7 @@ const SignUp: React.FC = () => {
             <View>
               <Title>Crie sua conta</Title>
             </View>
+
             <Form ref={formRef} onSubmit={handleSignUp}>
               <Input
                 autoCapitalize="words"
@@ -118,6 +120,7 @@ const SignUp: React.FC = () => {
                 returnKeyType="next"
                 onSubmitEditing={() => emailInputRef.current?.focus()}
               />
+
               <Input
                 ref={emailInputRef}
                 autoCorrect={false}
@@ -129,6 +132,7 @@ const SignUp: React.FC = () => {
                 returnKeyType="next"
                 onSubmitEditing={() => passwordInputRef.current?.focus()}
               />
+
               <Input
                 ref={passwordInputRef}
                 secureTextEntry
@@ -140,14 +144,17 @@ const SignUp: React.FC = () => {
                 onSubmitEditing={() => formRef.current?.submitForm()}
               />
             </Form>
+
             <Button onPress={() => formRef.current?.submitForm()}>
               Cadastrar
             </Button>
           </Container>
         </ScrollView>
       </KeyboardAvoidingView>
-      <BackToSignInButton onPress={() => navigation.goBack()}>
+
+      <BackToSignInButton onPress={() => goBack()}>
         <Icon name="arrow-left" size={20} color="#f4ede8" />
+
         <BackToSignInButtonText>Voltar para logon</BackToSignInButtonText>
       </BackToSignInButton>
     </>

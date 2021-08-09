@@ -71,7 +71,7 @@ const SignIn: React.FC = () => {
         } else if (err.request) {
           if (err.request.status === 0) {
             Alert.alert('Erro de Conexão', 'Acesso ao sevidor indisponível.');
-          } else if (err.request.status === 401) {
+          } else if (err.request.status === 400) {
             Alert.alert('Erro de Autenticação', 'Cheque as credenciais.');
           } else if (err.request.status === 500) {
             Alert.alert(
